@@ -1,68 +1,79 @@
-// frontend/src/context/AuthContext.jsx
-import { createContext, useState, useEffect, useContext } from 'react';
-import { loginUser, registerUser } from '../services/authService';
+import { createContext, useState, useContext } from 'react';
+import axios from 'axios';
 
 export const AuthContext = createContext();
 
-// Custom hook to use auth easily
+// Custom hook
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Load saved user
-  useEffect(() => {
-    const saved = localStorage.getItem('wastemapUser');
-    if (saved) setUser(JSON.parse(saved));
-    setLoading(false);
-  }, []);
-
-  const handleSetUser = (data) => {
-    setUser(data);
-    localStorage.setItem('wastemapUser', JSON.stringify(data));
-  };
-
-  // Login (returns success so component can redirect)
-  const login = async (credentials) => {
+  // Register function
+  const register = async ({ name, email, password }) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await loginUser(credentials);
-      handleSetUser(data);
-      return { success: true };
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-      return { success: false };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Register
-  const register = async (credentials) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await registerUser(credentials);
-      handleSetUser(data);
-      return { success: true };
+      const res = await axios.post('/api/auth/register', { name, email, password });
+      if (res.data?.user) {
+        setUser(res.data.user); // auto-login new user
+        setLoading(false);
+        return { success: true, user: res.data.user };
+      } else {
+        setError('Registration failed');
+        setLoading(false);
+        return { success: false };
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
-      return { success: false };
-    } finally {
       setLoading(false);
+      return { success: false };
     }
   };
 
+// Login function
+const login = async ({ email, password }) => {
+  setLoading(true);
+  setError(null);
+
+  try {
+    const res = await axios.post('/api/auth/login', { email, password });
+
+    // Backend returns the user fields directly (NOT inside res.data.user)
+    if (res.data && res.data._id) {
+      const userData = {
+        _id: res.data._id,
+        name: res.data.name,
+        email: res.data.email,
+        role: res.data.role,
+        token: res.data.token,
+      };
+
+      setUser(userData);
+      setLoading(false);
+
+      return { success: true, user: userData };
+    } else {
+      setError("Invalid credentials");
+      setLoading(false);
+      return { success: false };
+    }
+  } catch (err) {
+    setError(err.response?.data?.message || "Login failed");
+    setLoading(false);
+    return { success: false };
+  }
+};
+
+  // Logout function
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('wastemapUser');
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout }}>
+    <AuthContext.Provider value={{ user, register, login, logout, loading, error }}>
       {children}
     </AuthContext.Provider>
   );

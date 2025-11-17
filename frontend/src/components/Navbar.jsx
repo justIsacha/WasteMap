@@ -12,8 +12,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0 flex items-center">
-            <img src={logo} alt="WasteMap Logo" className="h-10 w-10 mr-2" />
-            <Link to="/" className="text-xl font-bold text-gray-800">
+            <img src={logo} alt="WasteMap Logo" className="h-15 w-15 mr-2" />
+            <Link to="/" className="text-xl font-bold text-gray-850">
               WasteMap
             </Link>
           </div>
@@ -39,12 +39,25 @@ const Navbar = () => {
             {user && (
               <>
                 <span className="text-gray-800 font-medium">Hello, {user.name}</span>
+                
+                {/* Regular Dashboard Link */}
                 <Link
                   to="/dashboard"
                   className="text-gray-700 hover:text-blue-600 font-medium"
                 >
                   Dashboard
                 </Link>
+
+                {/* Admin Dashboard Link - Only shows for admins */}
+                {user.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className="text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded-lg font-medium"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+
                 <button
                   onClick={logout}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg font-medium"

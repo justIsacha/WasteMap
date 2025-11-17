@@ -61,7 +61,11 @@ const RequestForm = () => {
               <option value="Household">Household</option>
               <option value="Recyclable">Recyclable</option>
               <option value="Bulky">Bulky</option>
+              <option value="Hazardous">Hazardous</option>
+              <option value="Garden">Garden</option>
+              <option value="Electronic">Electronic</option>
               <option value="Organic">Organic</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 

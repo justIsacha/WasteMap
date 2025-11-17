@@ -1,33 +1,10 @@
 // frontend/src/pages/Home.jsx
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png'; // Corrected path
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Hero Section */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <img src={logo} alt="WasteMap Logo" className="h-10 w-10 mr-2" />
-            <h1 className="text-xl font-bold text-gray-800">WasteMap</h1>
-          </div>
-          <div className="space-x-4">
-            <Link
-              to="/login"
-              className="text-gray-700 hover:text-blue-600 font-medium"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-            >
-              Register
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-green-50 flex flex-col">
+      {/* Removed duplicate header - using global Navbar instead */}
 
       <main className="flex-grow flex flex-col items-center justify-center px-4 text-center">
         <h2 className="text-4xl font-bold text-gray-800 mb-4">
@@ -82,7 +59,7 @@ const Home = () => {
         </section>
       </main>
 
-      <footer className="bg-white shadow py-6 text-center text-gray-600">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white shadow py-6 text-center text-gray-600">
         &copy; {new Date().getFullYear()} WasteMap. All rights reserved.
       </footer>
     </div>

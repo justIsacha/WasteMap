@@ -10,7 +10,7 @@ const requestSchema = new mongoose.Schema(
     wasteType: {
       type: String,
       required: [true, 'Waste type required'],
-      enum: ['Household', 'Recyclable', 'Bulky', 'Hazardous', 'Garden', 'Electronic', 'Other'],
+      enum: ['Household', 'Recyclable', 'Bulky', 'Hazardous', 'Garden', 'Electronic','Organic', 'Other'],
       default: 'Household',
     },
     description: {

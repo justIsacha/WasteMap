@@ -51,6 +51,34 @@ export async function getRequestById(req, res) {
     res.status(500).json({ message: 'Server error fetching request', error: error.message });
   }
 }
+export async function updateRequestStatus(req, res) {
+  try {
+    const { status } = req.body;
+    // Validate status
+    const validStatuses = ['Pending', 'In Progress', 'Completed', 'Cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
+    }
+    // Find request
+    const request = await Request.findById(req.params.id);
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+    //only admin can update status
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+    // Update status
+    request.status = status;
+    await request.save();
+//populate user info for response
+    await request.populate('user', 'name email');
+    res.json({ message: 'Status updated', request });
+  } catch (error) {
+    console.error('Error updating request status:', error);
+    res.status(500).json({ message: 'Server error updating status', error: error.message });
+  }
+}
 
 export async function updateRequest(req, res) {
   try {
@@ -58,6 +86,7 @@ export async function updateRequest(req, res) {
     if (!request) {
       return res.status(404).json({ message: 'Request not found' });
     }
+    // Only the owner or admin can update
     if (request.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized' });
     }

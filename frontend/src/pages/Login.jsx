@@ -1,6 +1,6 @@
 // frontend/src/pages/Login.jsx
 import { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
@@ -8,10 +8,23 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login({ email, password }); // Call login from context
+    
+    try {
+      // Call login from AuthContext (assume it returns { success: true/false })
+      const { success } = await login({ email, password });
+
+      if (success) {
+        navigate('/dashboard'); // Redirect on successful login
+      }
+    } catch (err) {
+      console.error('Login failed:', err);
+    }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
