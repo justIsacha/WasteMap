@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api', // Changed to port 5000 (backend port)
+  baseURL: 'https://wastemap-backend.onrender.com/api', // Update with your backend URL
   headers: {
     'Content-Type': 'application/json',
   },
