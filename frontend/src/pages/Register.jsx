@@ -1,108 +1,43 @@
-// frontend/src/pages/Register.jsx
-import { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+// frontend/src/context/AuthContext.jsx
+import { createContext, useState } from "react";
+import axios from "axios";
 
-const Register = () => {
-  const { register, loading, error } = useContext(AuthContext);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+export const AuthContext = createContext();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // Simple client-side password confirmation check
-    if (password !== confirmPassword) {
-      setPasswordError('Passwords do not match');
-      return;
+const API_URL = import.meta.env.VITE_API_URL;  
+// This will load:
+// - http://localhost:5000 (development)
+// - https://wastemap-backend.onrender.com (production)
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // REGISTER FUNCTION
+  const register = async (formData) => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const res = await axios.post(
+        `${API_URL}/api/auth/register`,   // <- FIXED URL
+        formData
+      );
+
+      setUser(res.data.user);
+      localStorage.setItem("token", res.data.token);
+
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
-    setPasswordError('');
-    await register({ name, email, password }); // Call register from context
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg">
-        <h1 className="text-2xl font-bold text-center text-gray-800">Create Account</h1>
-
-        {error && (
-          <div className="text-red-600 text-sm bg-red-100 p-2 rounded">{error}</div>
-        )}
-
-        {passwordError && (
-          <div className="text-red-600 text-sm bg-red-100 p-2 rounded">{passwordError}</div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Full Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="John Doe"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Confirm Password</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Re-enter your password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-2 px-4 text-white font-semibold rounded-lg ${
-              loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            {loading ? 'Registering...' : 'Register'}
-          </button>
-        </form>
-
-        <p className="text-sm text-center text-gray-500">
-          Already have an account?{' '}
-          <a href="/login" className="text-blue-600 hover:underline">
-            Login
-          </a>
-        </p>
-      </div>
-    </div>
+    <AuthContext.Provider value={{ user, register, loading, error }}>
+      {children}
+    </AuthContext.Provider>
   );
 };
-
-export default Register;
