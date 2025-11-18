@@ -1,12 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://wastemap-backend.onrender.com/api', // Update with your backend URL
+  baseURL: 'https://wastemap-backend.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  // Remove withCredentials unless you need cookies for authentication
-  // withCredentials: true,
 });
 
 // Request interceptor to attach JWT token
@@ -27,7 +25,6 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      // Redirect to login page
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
